@@ -1,0 +1,191 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import ProductCard from '@/components/ui/ProductCard';
+import { productsAPI } from '@/lib/api';
+import { useI18nStore } from '@/store/i18nStore';
+import { t } from '@/lib/i18n';
+import { Product } from '@/types';
+
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const locale = useI18nStore((s) => s.locale);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await productsAPI.list({ page: 1, page_size: 10 });
+      setProducts(response.data.products || []);
+    } catch {
+      console.error('Failed to fetch products');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[500px]">
+          <div className="space-y-6">
+            <span className="inline-block text-sm font-medium text-gray-500 uppercase tracking-widest">
+              {t(locale, 'home.newCollection')}
+            </span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-[1.1] tracking-tight">
+              {t(locale, 'home.heroTitle').split(' ').slice(0, 2).join(' ')}<br />{t(locale, 'home.heroTitle').split(' ').slice(2).join(' ')}
+            </h1>
+            <p className="text-lg text-gray-600 max-w-md leading-relaxed">
+              {t(locale, 'home.heroDesc')}
+            </p>
+            <div className="flex items-center gap-4 pt-2">
+              <Link href="/products" className="bg-black text-white font-medium px-8 py-4 text-sm uppercase tracking-wide hover:bg-gray-800 transition-colors">
+                {t(locale, 'home.shopNow')}
+              </Link>
+              <Link href="/categories" className="border border-black text-black font-medium px-8 py-4 text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors">
+                {t(locale, 'home.explore')}
+              </Link>
+            </div>
+          </div>
+          <div className="relative h-[400px] lg:h-[550px] bg-gray-100 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=1000&fit=crop" alt="Fashion Collection" className="w-full h-full object-cover" />
+          </div>
+        </div>
+      </section>
+
+      <div className="bg-black text-white py-4 overflow-hidden">
+        <div className="flex whitespace-nowrap animate-marquee">
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="text-sm font-medium uppercase tracking-widest mx-8">
+              {t(locale, 'nav.announcement')} • {t(locale, 'common.newArrivals')} • {t(locale, 'home.heroDesc').split('.')[0]} •{' '}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="flex items-end justify-between mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-black tracking-tight">{t(locale, 'home.popularThisWeek')}</h2>
+          <Link href="/products" className="text-sm font-medium text-gray-600 hover:text-black transition-colors uppercase tracking-wide border-b border-gray-300 hover:border-black pb-0.5">
+            {t(locale, 'common.viewAll')}
+          </Link>
+        </div>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
+            {products.slice(0, 10).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-[3/4] bg-gray-200" />
+                <div className="pt-3 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative h-[400px] md:h-[500px] overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=1000&fit=crop" alt="Men Collection" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute bottom-8 left-8 right-8">
+              <span className="text-white/80 text-sm uppercase tracking-widest mb-2 block">{t(locale, 'common.newArrivals')}</span>
+              <h3 className="text-3xl font-bold text-white mb-4">{t(locale, 'home.menCollection')}</h3>
+              <Link href="/products" className="inline-block bg-white text-black font-medium px-6 py-3 text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors">
+                {t(locale, 'home.shopNow')}
+              </Link>
+            </div>
+          </div>
+          <div className="relative h-[400px] md:h-[500px] overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=1000&fit=crop" alt="Women Collection" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute bottom-8 left-8 right-8">
+              <span className="text-white/80 text-sm uppercase tracking-widest mb-2 block">{t(locale, 'home.trendingNow')}</span>
+              <h3 className="text-3xl font-bold text-white mb-4">{t(locale, 'home.womenCollection')}</h3>
+              <Link href="/products" className="inline-block bg-white text-black font-medium px-6 py-3 text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors">
+                {t(locale, 'home.shopNow')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-black tracking-tight mb-2">{t(locale, 'home.onInstagram')}</h2>
+          <p className="text-gray-500 text-sm">{t(locale, 'home.followUs')}</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {['https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1467043237213-65f2da53396f?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop'].map((src, i) => (
+            <a key={i} href="#" className="aspect-square overflow-hidden group">
+              <img src={src} alt={`Instagram ${i + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <footer className="bg-gray-50 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div>
+              <span className="text-2xl font-bold tracking-tight text-black block mb-4">minimog</span>
+              <p className="text-gray-500 text-sm leading-relaxed mb-6">{t(locale, 'home.heroDesc')}</p>
+              <div className="flex items-center gap-3">
+                <a href="#" className="p-2 bg-white border border-gray-200 rounded-full hover:border-black transition-colors"><InstagramIcon className="w-4 h-4 text-gray-600" /></a>
+                <a href="#" className="p-2 bg-white border border-gray-200 rounded-full hover:border-black transition-colors"><XIcon className="w-4 h-4 text-gray-600" /></a>
+                <a href="#" className="p-2 bg-white border border-gray-200 rounded-full hover:border-black transition-colors"><FacebookIcon className="w-4 h-4 text-gray-600" /></a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4 text-sm uppercase tracking-wide">{t(locale, 'footer.company')}</h4>
+              <ul className="space-y-3">
+                <li><Link href="/about" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.aboutUs')}</Link></li>
+                <li><Link href="/careers" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.careers')}</Link></li>
+                <li><Link href="/press" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.press')}</Link></li>
+                <li><Link href="/contact" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.contact')}</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4 text-sm uppercase tracking-wide">{t(locale, 'footer.information')}</h4>
+              <ul className="space-y-3">
+                <li><Link href="/shipping" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.shippingReturns')}</Link></li>
+                <li><Link href="/faq" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.faq')}</Link></li>
+                <li><Link href="/privacy" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.privacyPolicy')}</Link></li>
+                <li><Link href="/terms" className="text-gray-500 hover:text-black transition-colors text-sm">{t(locale, 'footer.termsOfService')}</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4 text-sm uppercase tracking-wide">{t(locale, 'footer.subscribe')}</h4>
+              <p className="text-gray-500 text-sm mb-4">{t(locale, 'footer.subscribeDesc')}</p>
+              <div className="flex gap-2">
+                <input type="email" placeholder={t(locale, 'footer.enterEmail')} className="flex-1 px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors" />
+                <button className="bg-black text-white px-4 py-3 text-sm font-medium hover:bg-gray-800 transition-colors">{t(locale, 'footer.subscribe')}</button>
+              </div>
+            </div>
+          </div>
+          <div className="mt-16 pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} minimog. All rights reserved.</p>
+            <div className="flex items-center gap-2">
+              {['Visa', 'Mastercard', 'Amex', 'PayPal'].map((payment) => (
+                <div key={payment} className="px-3 py-1.5 bg-white border border-gray-200 rounded text-xs text-gray-500 font-medium">{payment}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function InstagramIcon(props: any) { return (<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.645-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069ZM12 0c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 3.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073ZM12 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8ZM18.406 4.152c-.796 0-1.44.645-1.44 1.44s.644 1.44 1.44 1.44c.795 0 1.44-.645 1.44-1.44s-.645-1.44-1.44-1.44Z" /></svg>); }
+function XIcon(props: any) { return (<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117Z" /></svg>); }
+function FacebookIcon(props: any) { return (<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>); }
