@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 
 export default function CartPage() {
@@ -13,6 +14,7 @@ export default function CartPage() {
   const locale = useI18nStore((s) => s.locale);
   const { isAuthenticated } = useAuthStore();
   const { cart, items, loading, fetchCart, updateItem, removeItem, clearCart, getTotal } = useCartStore();
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [updating, setUpdating] = useState<number | null>(null);
 
   useEffect(() => {
@@ -123,7 +125,7 @@ export default function CartPage() {
                       {item.product.title}
                     </Link>
                     <p className="text-gray-500 text-sm mt-1">
-                      ${item.product.price.toFixed(2)} {t(locale, 'cart.priceEach')}
+                      {formatPrice(item.product.price)} {t(locale, 'cart.priceEach')}
                     </p>
                   </div>
 
@@ -151,7 +153,7 @@ export default function CartPage() {
                   {/* Subtotal */}
                   <div className="text-right min-w-[5rem]">
                     <p className="font-semibold text-gray-900">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      {formatPrice(item.product.price * item.quantity)}
                     </p>
                   </div>
 
@@ -184,7 +186,7 @@ export default function CartPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>{t(locale, 'cart.subtotal')}</span>
-                  <span>${getTotal().toFixed(2)}</span>
+                  <span>{formatPrice(getTotal())}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>{t(locale, 'cart.shipping')}</span>
@@ -193,7 +195,7 @@ export default function CartPage() {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold text-gray-900">
                     <span>{t(locale, 'cart.total')}</span>
-                    <span>${getTotal().toFixed(2)}</span>
+                    <span>{formatPrice(getTotal())}</span>
                   </div>
                 </div>
               </div>

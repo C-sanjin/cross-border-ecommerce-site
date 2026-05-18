@@ -15,7 +15,7 @@ import (
 func Setup(app *fiber.App, db *gorm.DB, cfg *config.Config) {
 	// Initialize repositories, services and handlers
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo, cfg)
+	authService := service.NewAuthService(userRepo, db, cfg)
 	authHandler := handler.NewAuthHandler(authService)
 	
 	productRepo := repository.NewProductRepository(db)
@@ -127,7 +127,7 @@ func Setup(app *fiber.App, db *gorm.DB, cfg *config.Config) {
 	addresses.Delete("/:id", addressHandler.DeleteAddress)
 
 	// Admin routes
-	admin := app.Group("/api/v1/admin", middleware.AuthMiddleware(authService))
+	admin := app.Group("/api/v1/admin", middleware.AdminMiddleware(authService))
 	admin.Get("/orders", orderHandler.AdminListOrders)
 	admin.Get("/orders/:id", orderHandler.AdminGetOrder)
 	admin.Put("/orders/:id/status", orderHandler.AdminUpdateOrderStatus)

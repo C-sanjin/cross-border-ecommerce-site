@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import { addressesAPI, couponsAPI, ordersAPI } from '@/lib/api';
 import { UserAddress, CouponValidation } from '@/types';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 
 export default function CheckoutPage() {
@@ -14,6 +15,7 @@ export default function CheckoutPage() {
   const locale = useI18nStore((s) => s.locale);
   const { isAuthenticated, loading: authLoading } = useAuthStore();
   const { items, getTotal, fetchCart, clearCart, loading: cartLoading } = useCartStore();
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -289,7 +291,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium truncate">{item.product.title}</p>
                         <p className="text-xs text-gray-500">{t(locale, 'product.quantity')}: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</p>
                     </div>
                   ))}
                 </div>
@@ -301,7 +303,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200">
                       <div>
                         <span className="text-sm font-medium text-green-700">{couponCode}</span>
-                        <span className="text-sm text-green-600 ml-2">-${discountAmount.toFixed(2)}</span>
+                        <span className="text-sm text-green-600 ml-2">-{formatPrice(discountAmount)}</span>
                       </div>
                       <button type="button" onClick={handleRemoveCoupon} className="text-sm text-red-500 hover:text-red-700">{t(locale, 'checkout.remove')}</button>
                     </div>
@@ -324,24 +326,24 @@ export default function CheckoutPage() {
                 <div className="space-y-3 border-t border-gray-100 pt-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">{t(locale, 'cart.subtotal')}</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-sm text-green-600">
                       <span>{t(locale, 'checkout.discount')}</span>
-                      <span>-${discountAmount.toFixed(2)}</span>
+                      <span>-{formatPrice(discountAmount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">{t(locale, 'cart.shipping')}</span>
-                    <span>{shippingFee === 0 ? t(locale, 'cart.freeShipping') : `$${shippingFee.toFixed(2)}`}</span>
+                    <span>{shippingFee === 0 ? t(locale, 'cart.freeShipping') : formatPrice(shippingFee)}</span>
                   </div>
                   {shippingFee === 0 && (
                     <p className="text-xs text-green-600">Free shipping on orders over $100</p>
                   )}
                   <div className="flex justify-between text-lg font-bold border-t border-gray-100 pt-3">
                     <span>{t(locale, 'cart.total')}</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
 

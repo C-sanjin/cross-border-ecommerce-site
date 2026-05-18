@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 import { ordersAPI } from '@/lib/api';
 import { Order } from '@/types';
@@ -16,6 +17,7 @@ export default function OrderDetailPage() {
   const locale = useI18nStore((s) => s.locale);
   const orderId = parseInt(params.id as string);
   const { isAuthenticated, loading: authLoading } = useAuthStore();
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -133,7 +135,7 @@ export default function OrderDetailPage() {
                   <p className="text-sm text-gray-500">SKU: {item.sku_code}</p>
                 </div>
                 <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                <p className="font-semibold">${item.subtotal.toFixed(2)}</p>
+                <p className="font-semibold">{formatPrice(item.subtotal)}</p>
               </div>
             ))}
           </div>
@@ -160,21 +162,21 @@ export default function OrderDetailPage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">{t(locale, 'cart.subtotal')}</span>
-                <span>${(order.total_amount - order.shipping_fee).toFixed(2)}</span>
+                <span>{formatPrice(order.total_amount - order.shipping_fee)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">{t(locale, 'cart.shipping')}</span>
-                <span>${order.shipping_fee.toFixed(2)}</span>
+                <span>{formatPrice(order.shipping_fee)}</span>
               </div>
               {order.discount_amount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>{t(locale, 'checkout.discount')}</span>
-                  <span>-${order.discount_amount.toFixed(2)}</span>
+                  <span>-{formatPrice(order.discount_amount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-lg font-bold border-t pt-3">
                 <span>Total</span>
-                <span>${order.total_amount.toFixed(2)}</span>
+                <span>{formatPrice(order.total_amount)}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>{t(locale, 'checkout.paymentMethod')}</span>

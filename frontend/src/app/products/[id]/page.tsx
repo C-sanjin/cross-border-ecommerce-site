@@ -8,6 +8,7 @@ import { productsAPI } from '@/lib/api';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 import { Product } from '@/types';
 
@@ -22,6 +23,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
 
   useEffect(() => {
     fetchProduct();
@@ -153,11 +155,11 @@ export default function ProductDetailPage() {
 
             <div className="flex items-baseline gap-3">
               <span className="text-3xl font-bold text-black">
-                ${product.price.toFixed(2)}
+                {formatPrice(product.price)}
               </span>
               {product.compare_price > product.price && (
                 <span className="text-xl text-gray-400 line-through">
-                  ${product.compare_price.toFixed(2)}
+                  {formatPrice(product.compare_price)}
                 </span>
               )}
             </div>

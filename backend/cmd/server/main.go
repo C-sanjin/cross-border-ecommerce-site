@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/config"
+	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/middleware"
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/model"
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/repository"
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/router"
@@ -64,6 +65,11 @@ func main() {
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
 	}))
+
+	app.Use(middleware.SecurityHeaders())
+
+	apiRateLimitGrp := app.Group("/api")
+	apiRateLimitGrp.Use(middleware.RateLimiter(60))
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok", "timestamp": time.Now().Unix()})

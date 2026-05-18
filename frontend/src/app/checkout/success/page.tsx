@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 import { ordersAPI } from '@/lib/api';
 import { Order } from '@/types';
@@ -14,6 +15,7 @@ function OrderSuccessContent() {
   const orderId = searchParams?.get('order_id') || '';
   const { user } = useAuthStore();
   const locale = useI18nStore((s) => s.locale);
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,7 +69,7 @@ function OrderSuccessContent() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Total</span>
-                  <span className="font-bold text-lg">${order.total_amount.toFixed(2)}</span>
+                  <span className="font-bold text-lg">{formatPrice(order.total_amount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t(locale, 'checkout.paymentMethod')}</span>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { t } from '@/lib/i18n';
 import { ordersAPI } from '@/lib/api';
 import { Order } from '@/types';
@@ -22,6 +23,7 @@ export default function OrdersPage() {
   const router = useRouter();
   const locale = useI18nStore((s) => s.locale);
   const { isAuthenticated, loading: authLoading } = useAuthStore();
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -143,7 +145,7 @@ export default function OrdersPage() {
                   </div>
                   <div>
                     <p className="text-gray-400">Total</p>
-                    <p className="font-semibold text-gray-900">${order.total_amount.toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900">{formatPrice(order.total_amount)}</p>
                   </div>
                 </div>
 

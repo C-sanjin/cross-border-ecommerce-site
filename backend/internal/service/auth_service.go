@@ -6,6 +6,7 @@ import (
 	"time"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/config"
 	"github.com/C-sanjin/cross-border-ecommerce/backend/internal/model"
@@ -14,11 +15,12 @@ import (
 
 type AuthService struct {
 	userRepo *repository.UserRepository
+	db       *gorm.DB
 	cfg      *config.Config
 }
 
-func NewAuthService(userRepo *repository.UserRepository, cfg *config.Config) *AuthService {
-	return &AuthService{userRepo: userRepo, cfg: cfg}
+func NewAuthService(userRepo *repository.UserRepository, db *gorm.DB, cfg *config.Config) *AuthService {
+	return &AuthService{userRepo: userRepo, db: db, cfg: cfg}
 }
 
 type RegisterRequest struct {
@@ -60,7 +62,7 @@ func (s *AuthService) Register(req *RegisterRequest) (*AuthResponse, error) {
 		return nil, err
 	}
 	
-	return s.generateToken(user)
+	return s.generateToken(user, "user")
 }
 
 func (s *AuthService) Login(req *LoginRequest) (*AuthResponse, error) {
@@ -73,13 +75,29 @@ func (s *AuthService) Login(req *LoginRequest) (*AuthResponse, error) {
 		return nil, errors.New("invalid credentials")
 	}
 	
-	return s.generateToken(user)
+	role := s.getAdminRole(req.Email)
+	if role == "" {
+		role = "user"
+	}
+	
+	return s.generateToken(user, role)
 }
 
-func (s *AuthService) generateToken(user *model.User) (*AuthResponse, error) {
+func (s *AuthService) getAdminRole(email string) string {
+	var role string
+	s.db.Table("admin_users").Where("email = ? AND status = ?", email, "active").Select("role").Scan(&role)
+	return role
+}
+
+func (s *AuthService) generateToken(user *model.User, role string) (*AuthResponse, error) {
+	if role == "" {
+		role = "user"
+	}
+	
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
+		"role":    role,
 		"exp":     time.Now().Add(time.Minute * time.Duration(s.cfg.JWT.AccessExpiry)).Unix(),
 	})
 	
@@ -90,6 +108,7 @@ func (s *AuthService) generateToken(user *model.User) (*AuthResponse, error) {
 	
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
+		"role":    role,
 		"type":    "refresh",
 		"exp":     time.Now().Add(time.Minute * time.Duration(s.cfg.JWT.RefreshExpiry)).Unix(),
 	})
@@ -131,12 +150,17 @@ func (s *AuthService) RefreshAccessToken(refreshToken string) (*AuthResponse, er
 	if err != nil {
 		return nil, errors.New("invalid refresh token")
 	}
-	
+
 	userID := uint((*claims)["user_id"].(float64))
 	user, err := s.GetUserByID(userID)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
-	
-	return s.generateToken(user)
+
+	role, _ := (*claims)["role"].(string)
+	if role == "" {
+		role = "user"
+	}
+
+	return s.generateToken(user, role)
 }
