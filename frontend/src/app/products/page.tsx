@@ -22,11 +22,14 @@ function ProductsContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [keyword, setKeyword] = useState(initialKeyword);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [sortBy, setSortBy] = useState<string>('');
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, [page, selectedCategory]);
+  }, [page, selectedCategory, sortBy, minPrice, maxPrice]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -34,6 +37,9 @@ function ProductsContent() {
       const params: any = { page, page_size: 15 };
       if (selectedCategory) params.category_id = parseInt(selectedCategory);
       if (keyword) params.keyword = keyword;
+      if (sortBy) params.sort_by = sortBy;
+      if (minPrice > 0) params.min_price = minPrice;
+      if (maxPrice > 0) params.max_price = maxPrice;
 
       const response = await productsAPI.list(params);
       setProducts(response.data.products || []);
@@ -101,6 +107,44 @@ function ProductsContent() {
               </option>
             ))}
           </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors bg-white text-sm"
+          >
+            <option value="">{t(locale, 'product.sortBy')}</option>
+            <option value="price_asc">{t(locale, 'product.priceLowToHigh')}</option>
+            <option value="price_desc">{t(locale, 'product.priceHighToLow')}</option>
+            <option value="newest">{t(locale, 'product.newestFirst')}</option>
+            <option value="popular">{t(locale, 'product.mostPopular')}</option>
+          </select>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={minPrice > 0 ? minPrice : ''}
+              onChange={(e) => {
+                setMinPrice(e.target.value ? Number(e.target.value) : 0);
+              }}
+              placeholder={t(locale, 'product.minPrice')}
+              className="w-28 px-3 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors text-sm"
+            />
+            <span className="text-gray-400 text-sm">—</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={maxPrice > 0 ? maxPrice : ''}
+              onChange={(e) => {
+                setMaxPrice(e.target.value ? Number(e.target.value) : 0);
+              }}
+              placeholder={t(locale, 'product.maxPrice')}
+              className="w-28 px-3 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors text-sm"
+            />
+          </div>
         </div>
 
         {loading ? (

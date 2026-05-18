@@ -26,8 +26,12 @@ func Setup(app *fiber.App, db *gorm.DB, cfg *config.Config) {
 	cartService := service.NewCartService(cartRepo, productRepo)
 	cartHandler := handler.NewCartHandler(cartService)
 
+	couponRepo := repository.NewCouponRepository(db)
+	couponService := service.NewCouponService(couponRepo)
+	couponHandler := handler.NewCouponHandler(couponService)
+
 	orderRepo := repository.NewOrderRepository(db)
-	orderService := service.NewOrderService(orderRepo, cartRepo, productRepo)
+	orderService := service.NewOrderService(orderRepo, cartRepo, productRepo, couponService)
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	reviewRepo := repository.NewReviewRepository(db)
@@ -37,10 +41,6 @@ func Setup(app *fiber.App, db *gorm.DB, cfg *config.Config) {
 	addressRepo := repository.NewAddressRepository(db)
 	addressService := service.NewAddressService(addressRepo)
 	addressHandler := handler.NewAddressHandler(addressService)
-
-	couponRepo := repository.NewCouponRepository(db)
-	couponService := service.NewCouponService(couponRepo)
-	couponHandler := handler.NewCouponHandler(couponService)
 
 	api := app.Group("/api/v1")
 

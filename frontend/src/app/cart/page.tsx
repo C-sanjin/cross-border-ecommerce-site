@@ -7,6 +7,8 @@ import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCurrencyStore } from '@/store/currencyStore';
+import { couponsAPI } from '@/lib/api';
+import { CouponValidation } from '@/types';
 import { t } from '@/lib/i18n';
 
 export default function CartPage() {
@@ -16,6 +18,29 @@ export default function CartPage() {
   const { cart, items, loading, fetchCart, updateItem, removeItem, clearCart, getTotal } = useCartStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const [updating, setUpdating] = useState<number | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponValidation, setCouponValidation] = useState<CouponValidation | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponValidation(null);
+    try {
+      const subtotal = getTotal();
+      const res = await couponsAPI.validate(couponCode.trim(), subtotal);
+      setCouponValidation(res.data);
+    } catch {
+      setCouponValidation({ coupon: null as any, discount_amount: 0, is_valid: false, message: 'Failed to validate coupon' });
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setCouponValidation(null);
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -86,6 +111,11 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const subtotal = getTotal();
+  const shippingFee = 0;
+  const discountAmount = couponValidation?.is_valid ? couponValidation.discount_amount : 0;
+  const total = subtotal + shippingFee - discountAmount;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -183,19 +213,52 @@ export default function CartPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t(locale, 'common.orderSummary')}</h3>
 
+              {/* Coupon Code */}
+              <div className="mb-6 border-b border-gray-100 pb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t(locale, 'checkout.couponCode')}</label>
+                {couponValidation?.is_valid ? (
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div>
+                      <span className="text-sm font-medium text-green-700">{couponCode}</span>
+                      <span className="text-sm text-green-600 ml-2">-{formatPrice(discountAmount)}</span>
+                    </div>
+                    <button type="button" onClick={handleRemoveCoupon} className="text-sm text-red-500 hover:text-red-700">{t(locale, 'checkout.remove')}</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input type="text" value={couponCode} onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 px-4 py-2.5 border border-gray-200 focus:border-blue-600 focus:outline-none text-sm rounded-lg"
+                      placeholder={t(locale, 'checkout.couponCode')} />
+                    <button type="button" onClick={handleApplyCoupon} disabled={couponLoading}
+                      className="bg-blue-600 text-white font-medium px-4 py-2.5 text-sm hover:bg-blue-700 disabled:bg-gray-400 rounded-lg transition-colors">
+                      {couponLoading ? '...' : t(locale, 'checkout.apply')}
+                    </button>
+                  </div>
+                )}
+                {couponValidation && !couponValidation.is_valid && (
+                  <p className="text-xs text-red-500 mt-1">{couponValidation.message}</p>
+                )}
+              </div>
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>{t(locale, 'cart.subtotal')}</span>
-                  <span>{formatPrice(getTotal())}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>{t(locale, 'cart.shipping')}</span>
                   <span className="text-green-600">{t(locale, 'cart.freeShipping')}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>{t(locale, 'checkout.discount')}</span>
+                    <span>-{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold text-gray-900">
                     <span>{t(locale, 'cart.total')}</span>
-                    <span>{formatPrice(getTotal())}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
               </div>

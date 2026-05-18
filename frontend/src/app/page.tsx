@@ -2,11 +2,25 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import ProductCard from '@/components/ui/ProductCard';
 import { productsAPI } from '@/lib/api';
 import { useI18nStore } from '@/store/i18nStore';
 import { t } from '@/lib/i18n';
 import { Product } from '@/types';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,28 +43,47 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[500px]">
-          <div className="space-y-6">
-            <span className="inline-block text-sm font-medium text-gray-500 uppercase tracking-widest">
+          <motion.div
+            className="space-y-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.span
+              variants={itemVariants}
+              className="inline-block text-sm font-medium text-gray-500 uppercase tracking-widest"
+            >
               {t(locale, 'home.newCollection')}
-            </span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-[1.1] tracking-tight">
+            </motion.span>
+            <motion.h1
+              variants={itemVariants}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold text-black leading-[1.1] tracking-tight"
+            >
               {t(locale, 'home.heroTitle').split(' ').slice(0, 2).join(' ')}<br />{t(locale, 'home.heroTitle').split(' ').slice(2).join(' ')}
-            </h1>
-            <p className="text-lg text-gray-600 max-w-md leading-relaxed">
+            </motion.h1>
+            <motion.p
+              variants={itemVariants}
+              className="text-lg text-gray-600 max-w-md leading-relaxed"
+            >
               {t(locale, 'home.heroDesc')}
-            </p>
-            <div className="flex items-center gap-4 pt-2">
+            </motion.p>
+            <motion.div variants={itemVariants} className="flex items-center gap-4 pt-2">
               <Link href="/products" className="bg-black text-white font-medium px-8 py-4 text-sm uppercase tracking-wide hover:bg-gray-800 transition-colors">
                 {t(locale, 'home.shopNow')}
               </Link>
               <Link href="/categories" className="border border-black text-black font-medium px-8 py-4 text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors">
                 {t(locale, 'home.explore')}
               </Link>
-            </div>
-          </div>
-          <div className="relative h-[400px] lg:h-[550px] bg-gray-100 overflow-hidden">
+            </motion.div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
+            className="relative h-[400px] lg:h-[550px] bg-gray-100 overflow-hidden"
+          >
             <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=1000&fit=crop" alt="Fashion Collection" className="w-full h-full object-cover" />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -73,8 +106,15 @@ export default function Home() {
         </div>
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
-            {products.slice(0, 10).map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.slice(0, 10).map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.08 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
             ))}
           </div>
         ) : (
@@ -94,7 +134,12 @@ export default function Home() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="relative h-[400px] md:h-[500px] overflow-hidden group">
+          <motion.div
+            className="relative h-[400px] md:h-[500px] overflow-hidden group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
             <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=1000&fit=crop" alt="Men Collection" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute bottom-8 left-8 right-8">
@@ -104,8 +149,13 @@ export default function Home() {
                 {t(locale, 'home.shopNow')}
               </Link>
             </div>
-          </div>
-          <div className="relative h-[400px] md:h-[500px] overflow-hidden group">
+          </motion.div>
+          <motion.div
+            className="relative h-[400px] md:h-[500px] overflow-hidden group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=1000&fit=crop" alt="Women Collection" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute bottom-8 left-8 right-8">
@@ -115,7 +165,7 @@ export default function Home() {
                 {t(locale, 'home.shopNow')}
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -126,9 +176,16 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {['https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1467043237213-65f2da53396f?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop'].map((src, i) => (
-            <a key={i} href="#" className="aspect-square overflow-hidden group">
+            <motion.a
+              key={i}
+              href="#"
+              className="aspect-square overflow-hidden group"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.06 }}
+            >
               <img src={src} alt={`Instagram ${i + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-            </a>
+            </motion.a>
           ))}
         </div>
       </section>

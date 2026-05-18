@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Navbar from '@/components/ui/Navbar'
 import Footer from '@/components/ui/Footer'
+import ToastContainer from '@/components/ui/Toast'
 
 export const metadata: Metadata = {
   title: 'minimog - Premium Fashion',
@@ -19,6 +20,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ToastContainer />
       </body>
     </html>
   )

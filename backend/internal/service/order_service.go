@@ -10,19 +10,21 @@ import (
 )
 
 type OrderService struct {
-	orderRepo   *repository.OrderRepository
-	cartRepo    *repository.CartRepository
-	productRepo *repository.ProductRepository
+	orderRepo     *repository.OrderRepository
+	cartRepo      *repository.CartRepository
+	productRepo   *repository.ProductRepository
+	couponService *CouponService
 }
 
-func NewOrderService(orderRepo *repository.OrderRepository, cartRepo *repository.CartRepository, productRepo *repository.ProductRepository) *OrderService {
-	return &OrderService{orderRepo: orderRepo, cartRepo: cartRepo, productRepo: productRepo}
+func NewOrderService(orderRepo *repository.OrderRepository, cartRepo *repository.CartRepository, productRepo *repository.ProductRepository, couponService *CouponService) *OrderService {
+	return &OrderService{orderRepo: orderRepo, cartRepo: cartRepo, productRepo: productRepo, couponService: couponService}
 }
 
 type CreateOrderRequest struct {
 	ShippingAddress model.OrderAddress `json:"shipping_address"`
 	PaymentMethod   string             `json:"payment_method"`
 	Note            string             `json:"note"`
+	CouponCode      string             `json:"coupon_code"`
 }
 
 type OrderListResponse struct {
@@ -70,6 +72,21 @@ func (s *OrderService) CreateOrder(userID uint, req *CreateOrderRequest) (*model
 		}
 	}
 
+	var discountAmount float64
+	if req.CouponCode != "" {
+		couponResp, err := s.couponService.ValidateCoupon(&ValidateCouponRequest{
+			Code:        req.CouponCode,
+			OrderAmount: totalAmount,
+		})
+		if err == nil && couponResp.IsValid {
+			discountAmount = couponResp.DiscountAmount
+			totalAmount -= discountAmount
+			if err := s.couponService.ApplyCoupon(couponResp.Coupon.ID); err != nil {
+				return nil, errors.New("failed to apply coupon")
+			}
+		}
+	}
+
 	shippingFee := 0.0
 	if totalAmount < 100 {
 		shippingFee = 15.0
@@ -84,6 +101,7 @@ func (s *OrderService) CreateOrder(userID uint, req *CreateOrderRequest) (*model
 		UserID:          userID,
 		Status:          "pending",
 		TotalAmount:     totalAmount,
+		DiscountAmount:  discountAmount,
 		ShippingFee:     shippingFee,
 		PaymentMethod:   req.PaymentMethod,
 		ShippingName:    addr.Name,
