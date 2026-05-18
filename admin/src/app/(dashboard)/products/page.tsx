@@ -6,6 +6,12 @@ import ProductFormModal from '@/components/ProductFormModal';
 import { adminAPI } from '@/lib/api';
 import { Product } from '@/types';
 
+const productStatusLabels: Record<string, string> = {
+  active: '上架',
+  draft: '草稿',
+  inactive: '已归档',
+};
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,12 +41,12 @@ export default function ProductsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('确定要删除此商品吗？')) return;
     try {
       await adminAPI.deleteProduct(id);
       fetchProducts();
     } catch {
-      alert('Failed to delete product');
+      alert('删除商品失败');
     }
   };
 
@@ -49,12 +55,12 @@ export default function ProductsPage() {
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Products</h1>
+          <h1 className="text-2xl font-bold">商品管理</h1>
           <button
             onClick={() => { setEditingProduct(null); setShowModal(true); }}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Add Product
+            添加商品
           </button>
         </div>
 
@@ -67,7 +73,7 @@ export default function ProductsPage() {
                 statusFilter === s ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-50'
               }`}
             >
-              {s || 'All'}
+              {s ? (productStatusLabels[s] || s) : '全部'}
             </button>
           ))}
         </div>
@@ -86,12 +92,12 @@ export default function ProductsPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">ID</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Title</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Stock</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">编号</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">标题</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">价格</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">库存</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">状态</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -99,14 +105,14 @@ export default function ProductsPage() {
                   <tr key={p.id} className="border-t">
                     <td className="px-4 py-3 text-sm">{p.id}</td>
                     <td className="px-4 py-3 text-sm font-medium">{p.title}</td>
-                    <td className="px-4 py-3 text-sm">${p.price.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm">¥{p.price.toFixed(2)}</td>
                     <td className="px-4 py-3 text-sm">{p.stock}</td>
                     <td className="px-4 py-3 text-sm capitalize">
                       <span className={`px-2 py-1 rounded text-xs ${
                         p.status === 'active' ? 'bg-green-100 text-green-800' :
                         p.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-gray-100 text-gray-800'
-                      }`}>{p.status}</span>
+                      }`}>{productStatusLabels[p.status] || p.status}</span>
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <button
@@ -138,7 +144,7 @@ export default function ProductsPage() {
                 className={`px-4 py-2 border rounded ${p === page ? 'bg-blue-600 text-white' : 'hover:bg-gray-50'}`}>{p}</button>
             ))}
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-              className="px-4 py-2 border rounded disabled:opacity-50">Next</button>
+              className="px-4 py-2 border rounded disabled:opacity-50">下一页</button>
           </div>
         )}
       </div>

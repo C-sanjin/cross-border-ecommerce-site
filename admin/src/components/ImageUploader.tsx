@@ -63,7 +63,7 @@ export default function ImageUploader({ images, onChange, maxImages = 10 }: Imag
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">商品图片</label>
 
       <div
         onDragOver={handleDragOver}
@@ -91,7 +91,7 @@ export default function ImageUploader({ images, onChange, maxImages = 10 }: Imag
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
             </svg>
-            <p className="text-sm text-gray-500">Uploading...</p>
+            <p className="text-sm text-gray-500">上传中...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
@@ -99,9 +99,9 @@ export default function ImageUploader({ images, onChange, maxImages = 10 }: Imag
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             <p className="text-sm text-gray-600">
-              <span className="text-indigo-600 font-medium">Click to upload</span> or drag and drop
+              <span className="text-indigo-600 font-medium">点击上传</span> 或拖拽图片
             </p>
-            <p className="text-xs text-gray-400">PNG, JPG, WebP up to 10MB each</p>
+            <p className="text-xs text-gray-400">支持 PNG、JPG、WebP，每张不超过 10MB</p>
           </div>
         )}
       </div>
@@ -117,7 +117,7 @@ export default function ImageUploader({ images, onChange, maxImages = 10 }: Imag
                   alt={filename}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="50" text-anchor="middle" font-size="12" fill="%23999">No preview</text></svg>';
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="50" text-anchor="middle" font-size="12" fill="%23999">无法预览</text></svg>';
                   }}
                 />
                 <button

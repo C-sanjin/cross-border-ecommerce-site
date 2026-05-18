@@ -27,19 +27,19 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { label: 'Total Revenue', value: stats ? `$${stats.total_revenue.toFixed(2)}` : '-', color: 'bg-green-500' },
-    { label: 'Total Orders', value: stats?.total_orders || 0, color: 'bg-blue-500' },
-    { label: 'Total Users', value: stats?.total_users || 0, color: 'bg-purple-500' },
-    { label: 'Total Products', value: stats?.total_products || 0, color: 'bg-orange-500' },
-    { label: 'Pending Orders', value: stats?.pending_orders || 0, color: 'bg-yellow-500' },
-    { label: 'Low Stock Items', value: stats?.low_stock_products || 0, color: 'bg-red-500' },
+    { label: '总收入', value: stats ? `¥${stats.total_revenue.toFixed(2)}` : '-', color: 'bg-green-500' },
+    { label: '总订单数', value: stats?.total_orders || 0, color: 'bg-blue-500' },
+    { label: '总用户数', value: stats?.total_users || 0, color: 'bg-purple-500' },
+    { label: '总商品数', value: stats?.total_products || 0, color: 'bg-orange-500' },
+    { label: '待处理订单', value: stats?.pending_orders || 0, color: 'bg-yellow-500' },
+    { label: '库存不足', value: stats?.low_stock_products || 0, color: 'bg-red-500' },
   ];
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-6">仪表盘</h1>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

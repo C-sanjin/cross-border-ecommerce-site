@@ -111,7 +111,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">
-            {isEdit ? 'Edit Product' : 'Add Product'}
+            {isEdit ? '编辑商品' : '添加商品'}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
         </div>
@@ -123,41 +123,41 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className={labelClass}>Title *</label>
+              <label className={labelClass}>商品名称 *</label>
               <input
                 className={inputClass}
                 value={form.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
-                placeholder="Product title"
+                placeholder="输入商品名称"
               />
             </div>
 
             <div>
-              <label className={labelClass}>Slug</label>
+              <label className={labelClass}>URL别名</label>
               <input
                 className={inputClass}
                 value={form.slug}
                 onChange={(e) => handleChange('slug', e.target.value)}
-                placeholder="product-slug"
+                placeholder="商品-url-别名"
               />
             </div>
 
             <div>
-              <label className={labelClass}>Status</label>
+              <label className={labelClass}>状态</label>
               <select
                 className={inputClass}
                 value={form.status}
                 onChange={(e) => handleChange('status', e.target.value)}
               >
-                <option value="draft">Draft</option>
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
+                <option value="draft">草稿</option>
+                <option value="active">上架</option>
+                <option value="archived">已归档</option>
               </select>
             </div>
 
             <div>
-              <label className={labelClass}>Category</label>
+              <label className={labelClass}>分类</label>
               <select
                 className={inputClass}
                 value={form.category_id}
@@ -170,7 +170,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
             </div>
 
             <div>
-              <label className={labelClass}>Price *</label>
+              <label className={labelClass}>价格 *</label>
               <input
                 className={inputClass}
                 type="number"
@@ -183,7 +183,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
             </div>
 
             <div>
-              <label className={labelClass}>Compare Price</label>
+              <label className={labelClass}>原价</label>
               <input
                 className={inputClass}
                 type="number"
@@ -195,7 +195,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
             </div>
 
             <div>
-              <label className={labelClass}>Stock *</label>
+              <label className={labelClass}>库存 *</label>
               <input
                 className={inputClass}
                 type="number"
@@ -219,12 +219,12 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
             </div>
 
             <div className="md:col-span-2">
-              <label className={labelClass}>Short Description</label>
+              <label className={labelClass}>简短描述</label>
               <input
                 className={inputClass}
                 value={form.short_desc}
                 onChange={(e) => handleChange('short_desc', e.target.value)}
-                placeholder="Brief product summary"
+                placeholder="简短的商品描述"
               />
             </div>
 
@@ -235,7 +235,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
                 rows={4}
                 value={form.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                placeholder="Detailed product description"
+                placeholder="详细的商品介绍"
               />
             </div>
 
@@ -247,12 +247,12 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
             </div>
 
             <div className="md:col-span-2">
-              <label className={labelClass}>Meta Title (SEO)</label>
+              <label className={labelClass}>SEO标题</label>
               <input
                 className={inputClass}
                 value={form.meta_title}
                 onChange={(e) => handleChange('meta_title', e.target.value)}
-                placeholder="SEO title"
+                placeholder="SEO标题"
               />
             </div>
 
@@ -263,7 +263,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
                 rows={2}
                 value={form.meta_desc}
                 onChange={(e) => handleChange('meta_desc', e.target.value)}
-                placeholder="SEO description"
+                placeholder="SEO描述"
               />
             </div>
 
@@ -275,7 +275,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: ProductF
                   onChange={(e) => handleChange('is_featured', e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="text-sm text-gray-700">Featured Product</span>
+                <span className="text-sm text-gray-700">推荐商品</span>
               </label>
             </div>
           </div>

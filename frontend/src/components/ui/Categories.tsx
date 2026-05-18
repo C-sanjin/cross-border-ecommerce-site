@@ -43,13 +43,23 @@ export default function Categories() {
             <button
               key={cat.id}
               onClick={() => router.push(`/products?category_id=${cat.id}`)}
-              className="group relative overflow-hidden rounded-2xl border border-gray-200 hover:border-blue-300 transition-all hover:shadow-lg bg-gradient-to-br from-gray-50 to-white p-8 text-center"
+              className="group relative overflow-hidden rounded-2xl border border-gray-200 hover:border-blue-300 transition-all hover:shadow-lg aspect-square"
             >
-              <div className="text-4xl mb-3">{cat.name.charAt(0)}</div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                {cat.name}
-              </h3>
-              <p className="text-sm text-gray-500 mt-1">{t(locale, 'common.shop')}</p>
+              {cat.image_url ? (
+                <img
+                  src={cat.image_url}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : null}
+              <div className={`absolute inset-0 flex flex-col items-center justify-center p-8 text-center ${cat.image_url ? 'bg-black/20 group-hover:bg-black/30 transition-colors' : 'bg-gradient-to-br from-gray-50 to-white'}`}>
+                {!cat.image_url && <div className="text-4xl mb-3">{cat.name.charAt(0)}</div>}
+                <h3 className={`font-semibold transition-colors ${cat.image_url ? 'text-white drop-shadow-sm' : 'text-gray-900 group-hover:text-blue-600'}`}>
+                  {cat.name}
+                </h3>
+                <p className={`text-sm mt-1 ${cat.image_url ? 'text-white/80' : 'text-gray-500'}`}>{t(locale, 'common.shop')}</p>
+              </div>
             </button>
           ))}
         </div>

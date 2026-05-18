@@ -5,8 +5,21 @@ import Footer from '@/components/ui/Footer'
 import ToastContainer from '@/components/ui/Toast'
 
 export const metadata: Metadata = {
-  title: 'minimog - Premium Fashion',
-  description: 'Discover premium fashion essentials with worldwide delivery',
+  title: {
+    default: 'The Boutique - Cross-Border Fashion',
+    template: '%s - The Boutique',
+  },
+  description: 'Discover curated fashion from around the world. Premium cross-border ecommerce for contemporary style.',
+  openGraph: {
+    title: 'The Boutique - Cross-Border Fashion',
+    description: 'Discover curated fashion from around the world.',
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'The Boutique',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({

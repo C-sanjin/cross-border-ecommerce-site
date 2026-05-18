@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Admin Panel - Cross Border Ecommerce",
-  description: "Admin dashboard for cross-border ecommerce site",
+  title: "运营管理后台",
+  description: "跨境电商运营管理后台",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-gray-100">{children}</body>

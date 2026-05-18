@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -72,7 +73,40 @@ func main() {
 	apiRateLimitGrp.Use(middleware.RateLimiter(60))
 
 	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"status": "ok", "timestamp": time.Now().Unix()})
+		var dbStatus = "ok"
+		var dbError string
+		var latencyMs int64
+
+		start := time.Now()
+		if sqlDB, err := db.DB(); err != nil {
+			dbStatus = "error"
+			dbError = err.Error()
+		} else {
+			if err := sqlDB.Ping(); err != nil {
+				dbStatus = "error"
+				dbError = err.Error()
+			} else {
+				dbStatus = "ok"
+			}
+			latencyMs = time.Since(start).Milliseconds()
+		}
+
+		overallStatus := "ok"
+		if dbStatus != "ok" {
+			overallStatus = "degraded"
+		}
+
+		return c.JSON(fiber.Map{
+			"status":    overallStatus,
+			"timestamp": time.Now().Unix(),
+			"checks": fiber.Map{
+				"database": fiber.Map{
+					"status":  dbStatus,
+					"error":   dbError,
+					"latency": fmt.Sprintf("%dms", latencyMs),
+				},
+			},
+		})
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {

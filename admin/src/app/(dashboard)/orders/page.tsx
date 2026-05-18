@@ -15,6 +15,16 @@ const statusColors: Record<string, string> = {
   refunded: 'bg-gray-100 text-gray-800',
 };
 
+const statusLabels: Record<string, string> = {
+  pending: '待付款',
+  paid: '已付款',
+  processing: '处理中',
+  shipped: '已发货',
+  delivered: '已送达',
+  cancelled: '已取消',
+  refunded: '已退款',
+};
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,17 +59,17 @@ export default function OrdersPage() {
       setShowUpdateModal(false);
       fetchOrders();
     } catch {
-      alert('Failed to update status');
+      alert('更新状态失败');
     }
   };
 
   const handleRefund = async (orderId: number) => {
-    if (!confirm('Are you sure you want to refund this order?')) return;
+    if (!confirm('确定要退款此订单吗？')) return;
     try {
       await adminAPI.refundOrder(orderId);
       fetchOrders();
     } catch {
-      alert('Failed to refund order');
+      alert('退款失败');
     }
   };
 
@@ -67,7 +77,7 @@ export default function OrdersPage() {
     <div className="flex">
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-6">Orders</h1>
+        <h1 className="text-2xl font-bold mb-6">订单管理</h1>
 
         <div className="flex gap-2 mb-4 flex-wrap">
           {['', 'pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].map((s) => (
@@ -97,13 +107,13 @@ export default function OrdersPage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Order No</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Items</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Total</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Payment</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">订单号</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">状态</th>
+                  <th className="px-4 text-left text-sm font-medium text-gray-500">商品数</th>
+                  <th className="px-4 text-left text-sm font-medium text-gray-500">金额</th>
+                  <th className="px-4 text-left text-sm font-medium text-gray-500">支付方式</th>
+                  <th className="px-4 text-left text-sm font-medium text-gray-500">日期</th>
+                  <th className="px-4 text-left text-sm font-medium text-gray-500">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,11 +122,11 @@ export default function OrdersPage() {
                     <td className="px-4 py-3 text-sm font-medium">{o.order_no}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${statusColors[o.status] || 'bg-gray-100 text-gray-800'}`}>
-                        {o.status}
+                        {statusLabels[o.status] || o.status}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm">{o.items?.length || 0}</td>
-                    <td className="px-4 py-3 text-sm font-semibold">${o.total_amount.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm font-semibold">¥{o.total_amount.toFixed(2)}</td>
                     <td className="px-4 py-3 text-sm capitalize">{o.payment_method}</td>
                     <td className="px-4 py-3 text-sm">{new Date(o.created_at * 1000).toLocaleDateString()}</td>
                     <td className="px-4 py-3 text-sm space-x-2">
@@ -124,14 +134,14 @@ export default function OrdersPage() {
                         onClick={() => { setSelectedOrder(o); setShowUpdateModal(true); }}
                         className="text-blue-600 hover:text-blue-800"
                       >
-                        Update Status
+                        更新状态
                       </button>
                       {(o.status === 'paid' || o.status === 'delivered') && (
                         <button
                           onClick={() => handleRefund(o.id)}
                           className="text-red-600 hover:text-red-800"
                         >
-                          Refund
+                          退款
                         </button>
                       )}
                     </td>
@@ -145,13 +155,13 @@ export default function OrdersPage() {
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-4">
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-              className="px-4 py-2 border rounded disabled:opacity-50">Previous</button>
+              className="px-4 py-2 border rounded disabled:opacity-50">上一页</button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
               <button key={p} onClick={() => setPage(p)}
                 className={`px-4 py-2 border rounded ${p === page ? 'bg-blue-600 text-white' : 'hover:bg-gray-50'}`}>{p}</button>
             ))}
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-              className="px-4 py-2 border rounded disabled:opacity-50">Next</button>
+              className="px-4 py-2 border rounded disabled:opacity-50">下一页</button>
           </div>
         )}
 
@@ -159,7 +169,7 @@ export default function OrdersPage() {
         {showUpdateModal && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-96">
-              <h2 className="text-lg font-bold mb-4">Update Order Status</h2>
+              <h2 className="text-lg font-bold mb-4">更新订单状态</h2>
               <p className="text-sm text-gray-500 mb-4">Order: {selectedOrder.order_no}</p>
               <p className="text-sm text-gray-500 mb-4">Current: {selectedOrder.status}</p>
               <div className="space-y-2">
@@ -172,12 +182,12 @@ export default function OrdersPage() {
                     }`}
                     disabled={selectedOrder.status === s}
                   >
-                    {s} {selectedOrder.status === s ? '(current)' : ''}
+                    {statusLabels[s] || s} {selectedOrder.status === s ? '(当前)' : ''}
                   </button>
                 ))}
               </div>
               <button onClick={() => setShowUpdateModal(false)} className="mt-4 w-full px-4 py-2 border rounded hover:bg-gray-50">
-                Cancel
+                取消
               </button>
             </div>
           </div>
