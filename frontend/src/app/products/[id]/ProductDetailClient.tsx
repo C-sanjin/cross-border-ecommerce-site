@@ -9,6 +9,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCurrencyStore } from '@/store/currencyStore';
+import { useToastStore } from '@/store/toastStore';
 import { t } from '@/lib/i18n';
 import { Product } from '@/types';
 
@@ -23,6 +24,7 @@ export default function ProductDetailClient({ params }: { params: { id: string }
   const addItem = useCartStore((state) => state.addItem);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const addToast = useToastStore((s) => s.addToast);
 
   useEffect(() => {
     fetchProduct();
@@ -48,8 +50,9 @@ export default function ProductDetailClient({ params }: { params: { id: string }
     }
     try {
       await addItem(product.id, quantity);
+      addToast('Added to cart successfully', 'success');
     } catch {
-      // error handled by API interceptor
+      addToast('Failed to add to cart', 'error');
     }
   };
 

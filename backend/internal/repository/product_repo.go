@@ -18,7 +18,7 @@ func (r *ProductRepository) Create(product *model.Product) error {
 	return r.db.Create(product).Error
 }
 
-func (r *ProductRepository) FindAll(page, pageSize int, categoryID *uint, status string) ([]model.Product, int64, error) {
+func (r *ProductRepository) FindAll(page, pageSize int, categoryID *uint, sortBy string, minPrice, maxPrice float64, status string) ([]model.Product, int64, error) {
 	var products []model.Product
 	var total int64
 
@@ -28,10 +28,30 @@ func (r *ProductRepository) FindAll(page, pageSize int, categoryID *uint, status
 		query = query.Where("category_id = ?", *categoryID)
 	}
 
+	if minPrice > 0 {
+		query = query.Where("price >= ?", minPrice)
+	}
+	if maxPrice > 0 {
+		query = query.Where("price <= ?", maxPrice)
+	}
+
 	query.Count(&total)
 
 	offset := (page - 1) * pageSize
-	err := query.Offset(offset).Limit(pageSize).Order("created_at DESC").Find(&products).Error
+	switch sortBy {
+	case "price_asc":
+		query = query.Order("price ASC")
+	case "price_desc":
+		query = query.Order("price DESC")
+	case "newest":
+		query = query.Order("created_at DESC")
+	case "popular":
+		query = query.Order("id DESC")
+	default:
+		query = query.Order("created_at DESC")
+	}
+
+	err := query.Offset(offset).Limit(pageSize).Find(&products).Error
 
 	return products, total, err
 }

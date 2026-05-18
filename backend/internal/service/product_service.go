@@ -15,10 +15,13 @@ func NewProductService(productRepo *repository.ProductRepository) *ProductServic
 }
 
 type ProductListRequest struct {
-	Page       int    `query:"page"`
-	PageSize   int    `query:"page_size"`
-	CategoryID *uint  `query:"category_id"`
-	Keyword    string `query:"keyword"`
+	Page       int     `query:"page"`
+	PageSize   int     `query:"page_size"`
+	CategoryID *uint   `query:"category_id"`
+	Keyword    string  `query:"keyword"`
+	SortBy     string  `query:"sort_by"`
+	MinPrice   float64 `query:"min_price"`
+	MaxPrice   float64 `query:"max_price"`
 }
 
 type ProductListResponse struct {
@@ -44,7 +47,7 @@ func (s *ProductService) ListProducts(req *ProductListRequest) (*ProductListResp
 	if req.Keyword != "" {
 		products, total, err = s.productRepo.Search(req.Keyword, req.Page, req.PageSize)
 	} else {
-		products, total, err = s.productRepo.FindAll(req.Page, req.PageSize, req.CategoryID, "active")
+		products, total, err = s.productRepo.FindAll(req.Page, req.PageSize, req.CategoryID, req.SortBy, req.MinPrice, req.MaxPrice, "active")
 	}
 
 	if err != nil {

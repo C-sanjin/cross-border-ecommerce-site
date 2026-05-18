@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCurrencyStore } from '@/store/currencyStore';
+import { useToastStore } from '@/store/toastStore';
 import { couponsAPI } from '@/lib/api';
 import { CouponValidation } from '@/types';
 import { t } from '@/lib/i18n';
@@ -17,6 +18,7 @@ export default function CartPage() {
   const { isAuthenticated } = useAuthStore();
   const { cart, items, loading, fetchCart, updateItem, removeItem, clearCart, getTotal } = useCartStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const addToast = useToastStore((s) => s.addToast);
   const [updating, setUpdating] = useState<number | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [couponValidation, setCouponValidation] = useState<CouponValidation | null>(null);
@@ -30,8 +32,14 @@ export default function CartPage() {
       const subtotal = getTotal();
       const res = await couponsAPI.validate(couponCode.trim(), subtotal);
       setCouponValidation(res.data);
+      if (res.data.is_valid) {
+        addToast(`Coupon applied! -${formatPrice(res.data.discount_amount)}`, 'success');
+      } else {
+        addToast(res.data.message || 'Invalid coupon', 'error');
+      }
     } catch {
       setCouponValidation({ coupon: null as any, discount_amount: 0, is_valid: false, message: 'Failed to validate coupon' });
+      addToast('Failed to validate coupon', 'error');
     } finally {
       setCouponLoading(false);
     }
@@ -40,6 +48,7 @@ export default function CartPage() {
   const handleRemoveCoupon = () => {
     setCouponCode('');
     setCouponValidation(null);
+    addToast('Coupon removed', 'info');
   };
 
   useEffect(() => {
@@ -57,6 +66,7 @@ export default function CartPage() {
 
   const handleRemove = async (itemId: number) => {
     await removeItem(itemId);
+    addToast('Item removed from cart', 'info');
   };
 
   if (!isAuthenticated) {
@@ -201,7 +211,7 @@ export default function CartPage() {
             ))}
 
             <button
-              onClick={() => clearCart()}
+              onClick={async () => { await clearCart(); addToast('Cart cleared', 'info'); }}
               className="text-gray-500 hover:text-red-600 font-medium transition-colors"
             >
               {t(locale, 'cart.clearCart')}
@@ -264,7 +274,14 @@ export default function CartPage() {
               </div>
 
               <button
-                onClick={() => router.push('/checkout')}
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (couponCode && couponValidation?.is_valid) {
+                    params.set('coupon', couponCode);
+                    params.set('discount', String(discountAmount));
+                  }
+                  router.push(`/checkout?${params.toString()}`);
+                }}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
               >
                 {t(locale, 'cart.checkout')}

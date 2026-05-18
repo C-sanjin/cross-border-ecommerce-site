@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { addressesAPI, couponsAPI, ordersAPI } from '@/lib/api';
@@ -30,6 +30,26 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [couponValidation, setCouponValidation] = useState<CouponValidation | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const couponParam = searchParams.get('coupon');
+    if (couponParam && items.length > 0 && !couponValidation) {
+      setCouponCode(couponParam);
+      setCouponLoading(true);
+      couponsAPI.validate(couponParam, getTotal())
+        .then((res) => {
+          setCouponValidation(res.data);
+        })
+        .catch(() => {
+          setCouponValidation({ coupon: null as any, discount_amount: 0, is_valid: false, message: 'Failed to validate coupon' });
+        })
+        .finally(() => {
+          setCouponLoading(false);
+        });
+    }
+  }, [searchParams, items.length]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {

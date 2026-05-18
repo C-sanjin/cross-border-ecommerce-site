@@ -62,6 +62,7 @@ type Product struct {
 	Status        string             `json:"status" gorm:"default:'draft'; size:50"` // draft, active, inactive, out_of_stock
 	Images        string             `json:"images" gorm:"type:text"`
 	IsFeatured    bool               `json:"is_featured" gorm:"default:false"`
+	SalesCount    int                `json:"sales_count" gorm:"default:0"`
 	MetaTitle     string             `json:"meta_title" gorm:"size:500"`
 	MetaDesc      string             `json:"meta_desc" gorm:"type:text"`
 	CreatedAt     int64              `json:"created_at" gorm:"autoCreateTime"`

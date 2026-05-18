@@ -42,6 +42,20 @@ func (h *ProductHandler) ListProducts(c *fiber.Ctx) error {
 		}
 	}
 
+	req.SortBy = c.Query("sort_by")
+
+	if minPriceStr := c.Query("min_price"); minPriceStr != "" {
+		if mp, err := strconv.ParseFloat(minPriceStr, 64); err == nil {
+			req.MinPrice = mp
+		}
+	}
+
+	if maxPriceStr := c.Query("max_price"); maxPriceStr != "" {
+		if mp, err := strconv.ParseFloat(maxPriceStr, 64); err == nil {
+			req.MaxPrice = mp
+		}
+	}
+
 	response, err := h.productService.ListProducts(req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
