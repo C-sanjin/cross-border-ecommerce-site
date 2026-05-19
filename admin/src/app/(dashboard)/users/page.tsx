@@ -49,7 +49,11 @@ export default function UsersPage() {
     <div className="flex">
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-6">用户管理</h1>
+        <h1 className="text-2xl font-bold mb-6">商城用户管理</h1>
+
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+          <strong>说明：</strong>此处管理商城前台注册的买家用户。如需管理运营后台管理员账户，请前往「管理员管理」页面。
+        </div>
 
         <div className="flex gap-2 mb-4">
           {['', 'active', 'banned'].map((s) => (

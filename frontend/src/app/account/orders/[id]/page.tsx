@@ -18,6 +18,7 @@ export default function OrderDetailPage() {
   const orderId = parseInt(params.id as string);
   const { isAuthenticated, loading: authLoading } = useAuthStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 

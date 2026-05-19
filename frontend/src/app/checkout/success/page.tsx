@@ -16,6 +16,7 @@ function OrderSuccessContent() {
   const { user } = useAuthStore();
   const locale = useI18nStore((s) => s.locale);
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 

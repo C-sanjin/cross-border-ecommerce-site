@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+  AdminUser,
   DashboardStats,
   Order,
   PaginationResponse,
@@ -82,4 +83,13 @@ export const adminAPI = {
   getUser: (id: number) => api.get(`/admin/users/${id}`),
   updateUserStatus: (id: number, status: string) =>
     api.put(`/admin/users/${id}/status`, { status }),
+
+  listAdminUsers: (params?: { page?: number; page_size?: number; status?: string }) =>
+    api.get('/admin/admins', { params }),
+  getAdminUser: (id: number) => api.get(`/admin/admins/${id}`),
+  createAdminUser: (data: { username: string; email: string; password: string; name: string; role: string }) =>
+    api.post('/admin/admins', data),
+  updateAdminUserStatus: (id: number, status: string) =>
+    api.put(`/admin/admins/${id}/status`, { status }),
+  deleteAdminUser: (id: number) => api.delete(`/admin/admins/${id}`),
 };

@@ -112,3 +112,16 @@ export interface ProductCreateRequest {
 }
 
 export interface ProductUpdateRequest extends ProductCreateRequest {}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+  avatar: string;
+  role: string;
+  status: string;
+  last_login: number;
+  created_at: number;
+  updated_at: number;
+}

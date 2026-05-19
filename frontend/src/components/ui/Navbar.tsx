@@ -18,6 +18,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function Navbar() {
     if (savedCurrency) {
       useCurrencyStore.setState({ currency: savedCurrency });
     }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -122,7 +124,11 @@ export default function Navbar() {
               </button>
 
               {/* User */}
-              {isAuthenticated ? (
+              {!mounted ? (
+                <Link href="/account/login" className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                  <UserIcon className="w-5 h-5 text-gray-700" />
+                </Link>
+              ) : isAuthenticated ? (
                 <div className="relative group">
                   <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
                     <UserIcon className="w-5 h-5 text-gray-700" />

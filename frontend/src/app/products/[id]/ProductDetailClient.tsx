@@ -13,7 +13,7 @@ import { useToastStore } from '@/store/toastStore';
 import { t } from '@/lib/i18n';
 import { Product } from '@/types';
 
-export default function ProductDetailClient({ params }: { params: { id: string } }) {
+export default function ProductDetailClient({ id }: { id: string }) {
   const router = useRouter();
   const locale = useI18nStore((s) => s.locale);
   const [product, setProduct] = useState<Product | null>(null);
@@ -24,16 +24,17 @@ export default function ProductDetailClient({ params }: { params: { id: string }
   const addItem = useCartStore((state) => state.addItem);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const addToast = useToastStore((s) => s.addToast);
 
   useEffect(() => {
     fetchProduct();
-  }, [params.id]);
+  }, [id]);
 
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const response = await productsAPI.getById(Number(params.id));
+      const response = await productsAPI.getById(Number(id));
       setProduct(response.data);
     } catch {
       setError('Product not found');

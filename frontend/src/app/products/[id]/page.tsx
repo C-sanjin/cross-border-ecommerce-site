@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import ProductDetailClient from './ProductDetailClient';
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getProduct(id: string) {
@@ -18,7 +18,8 @@ async function getProduct(id: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
 
   if (!product) {
     return {
@@ -47,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProductPage({ params }: Props) {
-  return <ProductDetailClient params={params} />;
+export default async function ProductPage({ params }: Props) {
+  const { id } = await params;
+  return <ProductDetailClient id={id} />;
 }

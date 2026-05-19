@@ -18,6 +18,7 @@ export default function CartPage() {
   const { isAuthenticated } = useAuthStore();
   const { cart, items, loading, fetchCart, updateItem, removeItem, clearCart, getTotal } = useCartStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const addToast = useToastStore((s) => s.addToast);
   const [updating, setUpdating] = useState<number | null>(null);
   const [couponCode, setCouponCode] = useState('');

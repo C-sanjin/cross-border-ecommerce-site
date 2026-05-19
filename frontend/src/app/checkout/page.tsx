@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const { isAuthenticated, loading: authLoading } = useAuthStore();
   const { items, getTotal, fetchCart, clearCart, loading: cartLoading } = useCartStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 

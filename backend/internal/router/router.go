@@ -159,13 +159,24 @@ func Setup(app *fiber.App, db *gorm.DB, cfg *config.Config) {
 	admin.Post("/upload", uploadHandler.UploadImage)
 	admin.Post("/uploads", uploadHandler.UploadImages)
 
-	// Admin - User Management
+	// Admin - Mall User Management
 	userAdminService := adminservice.NewUserAdminService(userRepo)
 	userAdminHandler := adminhandler.NewUserAdminHandler(userAdminService)
 
 	admin.Get("/users", userAdminHandler.ListUsers)
 	admin.Get("/users/:id", userAdminHandler.GetUser)
 	admin.Put("/users/:id/status", userAdminHandler.UpdateUserStatus)
+
+	// Admin - Admin User Management
+	adminUserRepo := repository.NewAdminUserRepository(db)
+	adminUserAdminService := adminservice.NewAdminUserAdminService(adminUserRepo)
+	adminUserHandler := adminhandler.NewAdminUserHandler(adminUserAdminService)
+
+	admin.Get("/admins", adminUserHandler.ListAdminUsers)
+	admin.Get("/admins/:id", adminUserHandler.GetAdminUser)
+	admin.Post("/admins", adminUserHandler.CreateAdminUser)
+	admin.Put("/admins/:id/status", adminUserHandler.UpdateAdminUserStatus)
+	admin.Delete("/admins/:id", adminUserHandler.DeleteAdminUser)
 
 	// Admin - Dashboard
 	dashboardService := adminservice.NewDashboardService(db, orderRepo, productRepo, userRepo)

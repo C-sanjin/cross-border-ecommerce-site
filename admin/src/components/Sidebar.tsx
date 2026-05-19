@@ -7,7 +7,8 @@ const navItems = [
   { href: '/', label: '仪表盘', icon: '📊' },
   { href: '/products', label: '商品管理', icon: '📦' },
   { href: '/orders', label: '订单管理', icon: '🛒' },
-  { href: '/users', label: '用户管理', icon: '👥' },
+  { href: '/users', label: '商城用户', icon: '👥' },
+  { href: '/admins', label: '管理员管理', icon: '🔑' },
 ];
 
 export default function Sidebar() {

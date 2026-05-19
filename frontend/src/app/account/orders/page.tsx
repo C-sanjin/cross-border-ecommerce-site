@@ -24,6 +24,7 @@ export default function OrdersPage() {
   const locale = useI18nStore((s) => s.locale);
   const { isAuthenticated, loading: authLoading } = useAuthStore();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const currency = useCurrencyStore((s) => s.currency);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
